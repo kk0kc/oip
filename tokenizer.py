@@ -36,11 +36,12 @@ def lemmatize(tokens):
     return lemmas
 
 def process_documents(directory):
-    all_tokens = set()
-    lemmas_dict = {}
-
     for filename in os.listdir(directory):
         if filename.endswith('.html'):
+            page_name = filename.replace('.html', '')
+            output_dir = os.path.join(directory, page_name)
+            os.makedirs(output_dir, exist_ok=True)
+
             with open(os.path.join(directory, filename), 'r', encoding='utf-8') as file:
                 soup = BeautifulSoup(file, 'html.parser')
                 text = soup.get_text()
@@ -53,20 +54,15 @@ def process_documents(directory):
                         len(token) > 2 and
                         nlp(token)[0].pos_ != 'PROPN'):
                         filtered_tokens.add(token)
-                all_tokens.update(filtered_tokens)
                 lemmas = lemmatize(filtered_tokens)
-                for lemma, words in lemmas.items():
-                    if lemma not in lemmas_dict:
-                        lemmas_dict[lemma] = set()
-                    lemmas_dict[lemma].update(words)
 
-    with open('tokens.txt', 'w', encoding='utf-8') as f:
-        for token in sorted(all_tokens):
-            f.write(f"{token}\n")
+                with open(os.path.join(output_dir, 'tokens.txt'), 'w', encoding='utf-8') as f:
+                    for token in sorted(filtered_tokens):
+                        f.write(f"{token}\n")
+                with open(os.path.join(output_dir, 'lemmas.txt'), 'w', encoding='utf-8') as f:
+                    for lemma, words in sorted(lemmas.items()):
+                        if lemma in english_words:
+                            f.write(f"{lemma} {' '.join(sorted(words))}\n")
 
-    with open('lemmas.txt', 'w', encoding='utf-8') as f:
-        for lemma, words in sorted(lemmas_dict.items()):
-            if lemma in english_words:
-                f.write(f"{lemma} {' '.join(sorted(words))}\n")
-
+            print(f"Processed {filename} and saved results to {output_dir}")
 process_documents('pages')
