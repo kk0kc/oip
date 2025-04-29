@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поисковая система</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        .result {
+            margin-bottom: 15px;
+        }
+        .preview {
+            color: #555;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Поисковая система</h1>
+    <form method="POST">
+        <input type="text" name="query" placeholder="Введите запрос..." value="{{ query }}" required>
+        <button type="submit">Поиск</button>
+    </form>
+
+    {% if results %}
+        <h2>Результаты поиска:</h2>
+        {% for result in results %}
+            <div class="result">
+                <strong>Документ {{ result.doc_id }}</strong> (Релевантность: {{ result.score }})
+            </div>
+        {% endfor %}
+    {% elif query %}
+        <p>Ничего не найдено.</p>
+    {% endif %}
+</body>
+</html>
