@@ -43,8 +43,10 @@ def calculate_tf_idf(pages_dir='pages'):
     # 2. Расчет IDF
     total_docs = len(doc_lengths)
 
+    # def safe_idf(df, N):
+    #     return math.log((N) / (df))
     def safe_idf(df, N):
-        return math.log((N) / (df))
+        return math.log((N / df) + 1)
 
     # IDF для терминов
     term_idf = {term: safe_idf(len(docs), total_docs)
